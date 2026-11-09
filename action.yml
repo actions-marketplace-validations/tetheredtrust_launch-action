@@ -1,5 +1,5 @@
 name: "Tethered Trust Launch"
-description: "On every release: verify your MCP server works, publish it to the official MCP Registry, check x402 payments and ping search engines."
+description: "On every release: verify your MCP server, publish to the official MCP Registry, check x402 payments, ping search engines."
 author: "Tethered Trust"
 branding:
   icon: "send"
