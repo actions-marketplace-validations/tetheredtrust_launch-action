@@ -1,0 +1,76 @@
+name: "Tethered Trust Launch"
+description: "On every release: verify your MCP server works, publish it to the official MCP Registry, check x402 payments and ping search engines."
+author: "Tethered Trust"
+branding:
+  icon: "send"
+  color: "green"
+inputs:
+  url:
+    description: "Your MCP server's public https:// endpoint. Checked as an MCP client on every run."
+    required: false
+  server-json:
+    description: "Path to your server.json for the official MCP Registry. Its version is set to this release's version before publishing."
+    required: false
+    default: "server.json"
+  registry:
+    description: "How to sign in to the MCP Registry: github-oidc (io.github.<owner>/* names, no secrets), dns or http (your own domain, needs registry-private-key), or none."
+    required: false
+    default: "github-oidc"
+  registry-domain:
+    description: "Your domain, for registry: dns or http."
+    required: false
+  registry-private-key:
+    description: "Hex Ed25519 private key whose public key is in your DNS TXT record or /.well-known/mcp-registry-auth (registry: dns or http). Pass it from a secret."
+    required: false
+  version:
+    description: "Version to publish. Defaults to the release tag without a leading v."
+    required: false
+  x402-endpoints:
+    description: "Paid x402 endpoints to check, one per line (POST endpoints: 'POST https://...')."
+    required: false
+  npm:
+    description: "npm package name to confirm this version reached npm."
+    required: false
+  pypi:
+    description: "PyPI project name to confirm this version reached PyPI."
+    required: false
+  indexnow-key:
+    description: "Your IndexNow key (the key file must be served at https://<your-site>/<key>.txt)."
+    required: false
+  indexnow-urls:
+    description: "Pages to send to Bing and other IndexNow engines, one per line."
+    required: false
+  api-key:
+    description: "Optional Tethered Trust API key (tt_...) with credits, for checks beyond the free daily allowance."
+    required: false
+  fail-on:
+    description: "broken (default): fail the job when the server or a payment check is broken. never: report only."
+    required: false
+    default: "broken"
+outputs:
+  registry-published:
+    description: "true when this version was published to the MCP Registry."
+    value: ${{ steps.launch.outputs.registry-published }}
+  result:
+    description: "pass, warn or fail."
+    value: ${{ steps.launch.outputs.result }}
+runs:
+  using: "composite"
+  steps:
+    - id: launch
+      shell: bash
+      run: node "${{ github.action_path }}/index.mjs"
+      env:
+        TT_URL: ${{ inputs.url }}
+        TT_SERVER_JSON: ${{ inputs.server-json }}
+        TT_REGISTRY: ${{ inputs.registry }}
+        TT_REGISTRY_DOMAIN: ${{ inputs.registry-domain }}
+        TT_REGISTRY_KEY: ${{ inputs.registry-private-key }}
+        TT_VERSION: ${{ inputs.version }}
+        TT_X402: ${{ inputs.x402-endpoints }}
+        TT_NPM: ${{ inputs.npm }}
+        TT_PYPI: ${{ inputs.pypi }}
+        TT_INDEXNOW_KEY: ${{ inputs.indexnow-key }}
+        TT_INDEXNOW_URLS: ${{ inputs.indexnow-urls }}
+        TT_API_KEY: ${{ inputs.api-key }}
+        TT_FAIL_ON: ${{ inputs.fail-on }}
