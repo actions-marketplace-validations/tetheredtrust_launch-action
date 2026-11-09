@@ -33,4 +33,4 @@ jobs:
       - name: mcp-publisher still downloads and runs
         run: |
           curl -fsSL "https://github.com/modelcontextprotocol/registry/releases/latest/download/mcp-publisher_linux_amd64.tar.gz" | tar xz mcp-publisher
-          ./mcp-publisher --help | grep -q "github-oidc"
+          ./mcp-publisher login --help 2>&1 | grep -q "github-oidc"
