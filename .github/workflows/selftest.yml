@@ -1,0 +1,36 @@
+# Runs the action against Tethered Trust's own live server every week and on every change, so a change in the
+# MCP Registry tooling, x402 or our API shows up here before it reaches anyone's release.
+name: self-test
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    - cron: "17 14 * * 1"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  live:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - id: launch
+        uses: ./
+        with:
+          url: https://tetheredtrust.com/mcp
+          registry: none
+          x402-endpoints: |
+            POST https://tetheredtrust.com/v1/paid/check
+          npm: tethered-trust
+          pypi: tethered-trust
+          version: "0.1.0"
+      - name: Result
+        run: echo "result=${{ steps.launch.outputs.result }}"
+  publisher-tool:
+    runs-on: ubuntu-latest
+    steps:
+      - name: mcp-publisher still downloads and runs
+        run: |
+          curl -fsSL "https://github.com/modelcontextprotocol/registry/releases/latest/download/mcp-publisher_linux_amd64.tar.gz" | tar xz mcp-publisher
+          ./mcp-publisher --help | grep -q "github-oidc"
